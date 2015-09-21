@@ -4,7 +4,7 @@ var reader = new FileReader();
 reader.onload = function(e) {
   var contents = e.target.result;
   var data = d3.csv.parse(contents);
-  parallelCoordinates(data);
+  logTheData(data);
 
   // remove button, since re-initializing doesn't work for now
   uploader.parentNode.removeChild(uploader);
