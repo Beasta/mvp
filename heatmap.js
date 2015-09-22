@@ -2,9 +2,11 @@ var globalData;
 var logTheData = function(data){
   // var fixedData = dataFix(data);
   // console.log('fixedData', fixedData);
-  createMap(data);
-  globalData = data;
-  console.log(data);
+  var hourly = hourlyAverage(data);
+  createMap( hourly.hourlyArr, hourly.min, hourly.max );
+  // globalData = data;
+  // console.log('data',data);
+  console.log('hourlyAverage',hourly);
 };
 
 // var dataFix = function( data ) {
@@ -15,12 +17,63 @@ var logTheData = function(data){
 //   } else {
 //     iterations = 10080;
 //   }
-//   for (var i = 0; i < iterations; i++) { 
+//   for (var i = 0; i < iterations; i++) {
 //     smallerData.push(data[i]);
 //     // theDate = new Date(data[i].date);
 //    };
 //    return smallerData;
 // };
+
+var hourlyAverage = function(data){
+  var hourlyArr = [];
+  var thisHour = 0;
+  var thisHoursSum = 0;
+  var thisHoursItems = 0;
+  var maxValue=0;
+  var minValue=200;
+
+  for (var i = 0; i < data.length; i++){
+    theDate = new Date(data[i].date);
+    theDay = theDate.getDay();
+    theHour = theDate.getHours();
+    // theMinute = theDate.getMinutes();
+
+    if ( thisHour === theHour ) { // we haven't rolled over a new hour, if item is valid, increment hours items, add to hourssum
+
+       if ( data[i]["heart-rate"] !== "" ) { //check to see if its not empty
+          thisHoursSum = thisHoursSum + parseInt(data[i]["heart-rate"]);
+          thisHoursItems++;
+       }
+
+    } else { //we have rolled over a new hour, calculate the average and add to the array, reset hoursum and hoursitems, set thisHour
+
+      var theAverage = thisHoursSum / thisHoursItems ;
+      if ( theAverage > maxValue ) {
+        maxValue = theAverage;
+      } else if ( theAverage < minValue ) {
+        minValue = theAverage;
+      }
+      //add a data point for the hour
+      hourlyArr.push ( { //recreating data structure of previous example
+        day: theDay+1,
+        hour: theHour+1,
+        value: theAverage,
+        thisHoursItems:thisHoursItems,
+        thisHoursSum:thisHoursSum
+      } ) ;
+
+      //reset counters
+      thisHoursSum = 0;
+      thisHoursItems = 0;
+      thisHour = theHour;
+
+    }
+  }
+
+  return { hourlyArr : hourlyArr, min : minValue, max : maxValue };
+
+};
+
 var margin = { top: 50, right: 0, bottom: 100, left: 30 },
           width = 960 - margin.left - margin.right,
           height = 430 - margin.top - margin.bottom,
@@ -40,9 +93,9 @@ var margin = { top: 50, right: 0, bottom: 100, left: 30 },
       //       value: +d.value
       //     };
       //   },
-    var createMap = function( data ) {
+    var createMap = function( data, min, max ) {
           var colorScale = d3.scale.quantile()
-              .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+              .domain([min, buckets - 1, d3.max(data, function (d) { return d.value; })])
               .range(colors);
 
           var svg = d3.select("#chart").append("svg")
@@ -88,7 +141,7 @@ var margin = { top: 50, right: 0, bottom: 100, left: 30 },
           heatMap.transition().duration(3000)
               .style("fill", function(d) { return colorScale(d.value); });
 
-          heatMap.append("title").text(function(d) { return d.value; });
+          // heatMap.append("title").text(function(d) { return d.value; });  // this doesn't appear to be functional
           var legend = svg.selectAll(".legend")
               .data([0].concat(colorScale.quantiles()), function(d) { return d; })
               .enter().append("g")
