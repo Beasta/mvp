@@ -1,28 +1,9 @@
 var globalData;
 var logTheData = function(data){
-  // var fixedData = dataFix(data);
-  // console.log('fixedData', fixedData);
   var hourly = hourlyAverage(data);
+  globalData = hourly;
   createMap( hourly.hourlyArr, hourly.min, hourly.max );
-  // globalData = data;
-  // console.log('data',data);
-  console.log('hourlyAverage',hourly);
 };
-
-// var dataFix = function( data ) {
-//   var smallerData = [];
-//   var iterations = 0;
-//   if ( data.length < 10080 ) { //10080 minutes in a week
-//     iterations = data.length;
-//   } else {
-//     iterations = 10080;
-//   }
-//   for (var i = 0; i < iterations; i++) {
-//     smallerData.push(data[i]);
-//     // theDate = new Date(data[i].date);
-//    };
-//    return smallerData;
-// };
 
 var hourlyAverage = function(data){
   var hourlyArr = [];
@@ -31,6 +12,7 @@ var hourlyAverage = function(data){
   var thisHoursItems = 0;
   var maxValue=0;
   var minValue=200;
+  var theAverage = 60;
 
   for (var i = 0; i < data.length; i++){
     theDate = new Date(data[i].date);
@@ -47,7 +29,10 @@ var hourlyAverage = function(data){
 
     } else { //we have rolled over a new hour, calculate the average and add to the array, reset hoursum and hoursitems, set thisHour
 
-      var theAverage = thisHoursSum / thisHoursItems ;
+      if(thisHoursSum!==0){ //if for some reason the previous hour averaged to 0, just use the average from previous hour
+        theAverage = thisHoursSum / thisHoursItems ;
+      }
+
       if ( theAverage > maxValue ) {
         maxValue = theAverage;
       } else if ( theAverage < minValue ) {
@@ -58,8 +43,7 @@ var hourlyAverage = function(data){
         day: theDay+1,
         hour: theHour+1,
         value: theAverage,
-        thisHoursItems:thisHoursItems,
-        thisHoursSum:thisHoursSum
+        oldDate: theDate
       } ) ;
 
       //reset counters
@@ -76,7 +60,7 @@ var hourlyAverage = function(data){
 
 var margin = { top: 50, right: 0, bottom: 100, left: 30 },
           width = 960 - margin.left - margin.right,
-          height = 430 - margin.top - margin.bottom,
+          height = 1000 - margin.top - margin.bottom,
           gridSize = Math.floor(width / 24),
           legendElementWidth = gridSize*2,
           buckets = 9,
@@ -85,7 +69,7 @@ var margin = { top: 50, right: 0, bottom: 100, left: 30 },
           times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 
 
-      // d3.tsv("data.tsv",
+      // d3.tsv("data.  tsv",
       //   function(d) {
       //     return {
       //       day: +d.day,
@@ -95,12 +79,13 @@ var margin = { top: 50, right: 0, bottom: 100, left: 30 },
       //   },
     var createMap = function( data, min, max ) {
           var colorScale = d3.scale.quantile()
-              .domain([min, buckets - 1, d3.max(data, function (d) { return d.value; })])
+              .domain([min, d3.max(data, function (d) { return d.value; })])
               .range(colors);
 
           var svg = d3.select("#chart").append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
+              .attr("style", "outline: none")
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -128,7 +113,8 @@ var margin = { top: 50, right: 0, bottom: 100, left: 30 },
               .data(data)
               .enter().append("rect")
               .attr("x", function(d) { return (d.hour - 1) * gridSize; })
-              .attr("y", function(d) { return (d.day - 1) * gridSize; })
+              // .attr("y", function(d) { return (d.day - 1) * gridSize; })
+              .attr("y", function(d) { return (d3.time.weekOfYear(d.oldDate) % 7 ) * gridSize; })
               .attr("rx", 0)
               .attr("ry", 0)
               .attr("class", "hour ")
