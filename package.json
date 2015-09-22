@@ -1,0 +1,25 @@
+{
+  "name": "basispeakheatmap",
+  "version": "0.1.0",
+  "description": "graphic interface for interacting with the Basis Peak",
+  "main": "./server/myServer/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Beasta/2015-08-mvp.git"
+  },
+  "keywords": [
+    "Basis",
+    "Peak",
+    "D3",
+    "Heatmap"
+  ],
+  "author": "Beasta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Beasta/2015-08-mvp/issues"
+  },
+  "homepage": "https://github.com/Beasta/2015-08-mvp#readme"
+}

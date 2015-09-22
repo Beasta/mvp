@@ -1,8 +1,49 @@
 body {
-  padding: 50px;
+  padding: 4px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #222222;
 }
 
 a {
   color: #00B7FF;
+}
+
+rect.bordered {
+  stroke: #E6E6E6;
+  stroke-width:2px;   
+}
+
+text.mono {
+  font-size: 9pt;
+  font-family: Consolas, courier;
+  fill: #aaaaaa;
+}
+
+text.axis-workweek {
+  fill: #aaaaaa;
+}
+
+text.axis-worktime {
+  fill: #aaaaaa;
+}
+
+#weekBox {
+  background-color: #444444;
+  border: 1px solid #666666;
+}
+
+#uploader {
+  background-color: #444444
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    border: 1px solid #666666;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: #444444;
 }
