@@ -14,7 +14,7 @@ var hourlyAverage = function(data){
   var minValue=200;
   var theAverage = 60;
   //grab a weeks worth of datapoints - 10080 minutes in a week, or however many points are in data.length if its shorter than 10080
-  var dataPointsToGrab = data.length > 10080 ? 10080 : data.length;
+  var dataPointsToGrab = data.length > 10080 * 4 ? 10080 * 4 : data.length;
   console.log('dataPointsToGrab',dataPointsToGrab);
 
   for (var i = 0; i < dataPointsToGrab; i++){
@@ -62,29 +62,30 @@ var hourlyAverage = function(data){
 
 };
 
-var margin = { top: 50, right: 0, bottom: 100, left: 30 },
-          width = 960 - margin.left - margin.right,
-          height = 1000 - margin.top - margin.bottom,
-          gridSize = Math.floor(width / 24),
-          legendElementWidth = gridSize*2,
-          buckets = 9,
-          // colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#2ppasdfasdfasdf53494","#081d58"], // alternatively colorbrewer.YlGnBu[9]
-          // colors = ['#0001FF','#571BE8','#6E0FE8','#E41DFF', '#E80F67', '#E80F2D','#FF2C10'];
-          colors = [
-            '#009933',
-            '#208C46',
-            '#408059',
-            '#60736C',
-            '#806680',
-            '#9F5993',
-            '#BF4DA6',
-            '#DF40B9',
-            '#FF33CC'
-          ],
-          days = [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-          times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
+var margin = { top: 100, right: 0, bottom: 100, left: 30 },
+    width = 960 - margin.left - margin.right,
+    height = 2000 - margin.top - margin.bottom,
+    gridSize = Math.floor(width / 24),
+    legendElementWidth = gridSize*2,
+    buckets = 9,
+    // colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#2ppasdfasdfasdf53494","#081d58"], // alternatively colorbrewer.YlGnBu[9]
+    // colors = ['#0001FF','#571BE8','#6E0FE8','#E41DFF', '#E80F67', '#E80F2D','#FF2C10'];
+    colors = [
+      '#009933',
+      '#208C46',
+      '#408059',
+      '#60736C',
+      '#806680',
+      '#9F5993',
+      '#BF4DA6',
+      '#DF40B9',
+      '#FF33CC'
+    ],
+    days = [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa","Su", "Mo", "Tu", "We", "Th", "Fr", "Sa",  "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa","Su", "Mo", "Tu", "We", "Th", "Fr", "Sa",'Su','Mo'],
+    // days = [];
+    times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 
-
+  //this is the original data input format
   // d3.tsv("data.  tsv",
   //   function(d) {
   //     return {
@@ -114,6 +115,36 @@ var createMap = function( data, min, max ) {
       .append("g") //
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+  var heatMap = svg.selectAll(".hour")
+      .data(data)
+      .enter().append("rect")
+        .attr("x", function(d) { return ( d.hour ) * gridSize; })
+        .attr("y", function(d) { 
+          // console.log('theday',( d.week - data[0].week) * 7 + d.day , 'data[0].week', data[0].week);
+          return ( (  d.week - data[0].week ) * 7 + d.day ) * gridSize; })
+        // .attr("y", function(d) { return (d3.time.weekOfYear(d.oldDate) % 7 ) * gridSize; })
+        .attr("rx", 0)
+        .attr("ry", 0)
+        .attr("class", "hour ")
+        .attr("width", gridSize)
+        .attr("height", gridSize)
+        .style("fill", function(d) {
+          // return colors[Math.floor(Math.random()*9)];
+          return colors[9];
+        });
+
+        heatMap.append("svg:title")
+        .text(function(d) { return d.oldDate; });
+  // days[0] = data[0].week;
+  // data.forEach(function(d){
+  //   if
+  // });
+
+  heatMap.transition().duration( 3000 )
+      .style("fill", function(d) { return colorScale(d.value); });
+
+  // heatMap.append("title").text(function(d) { return d.value; });  // this doesn't appear to be functional
+
   var dayLabels = svg.selectAll(".dayLabel")
       .data(days)
       .enter().append("text")
@@ -134,28 +165,6 @@ var createMap = function( data, min, max ) {
         .attr("transform", "translate(" + gridSize / 2 + ", -6)")
         .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
 
-  var heatMap = svg.selectAll(".hour")
-      .data(data)
-      .enter().append("rect")
-        .attr("x", function(d) { return ( d.hour ) * gridSize; })
-        .attr("y", function(d) { 
-          // console.log('theday',( d.week - data[0].week) * 7 + d.day , 'data[0].week', data[0].week);
-          return ( (  d.week - data[0].week ) * 7 + d.day ) * gridSize; })
-        // .attr("y", function(d) { return (d3.time.weekOfYear(d.oldDate) % 7 ) * gridSize; })
-        .attr("rx", 0)
-        .attr("ry", 0)
-        .attr("class", "hour ")
-        .attr("width", gridSize)
-        .attr("height", gridSize)
-        .style("fill", function(d) {
-          // return colors[Math.floor(Math.random()*9)];
-          return colors[9];
-        });
-
-  heatMap.transition().duration( 3000 )
-      .style("fill", function(d) { return colorScale(d.value); });
-
-  // heatMap.append("title").text(function(d) { return d.value; });  // this doesn't appear to be functional
 
   //create legend svg
   var legend = svg.selectAll(".legend")
@@ -164,8 +173,9 @@ var createMap = function( data, min, max ) {
         .attr("class", "legend");
 
   legend.append("rect")
-    .attr("x", function(d, i) { return legendElementWidth * i; })
-    .attr("y", height)
+    .attr("x", function(d, i) { return legendElementWidth * i + 100 ; })
+    // .attr("y", height)
+    .attr ( "y", -60 )
     .attr("width", legendElementWidth)
     .attr("height", gridSize / 2)
     .style("fill", function(d, i) { return colors[i]; });
@@ -173,8 +183,9 @@ var createMap = function( data, min, max ) {
   legend.append("text")
     .attr("class", "mono")
     .text(function(d) { return "≥ " + Math.round(d); })
-    .attr("x", function(d, i) { return legendElementWidth * i; })
-    .attr("y", height + gridSize);
+    .attr("x", function(d, i) { return legendElementWidth * i + 100; })
+    // .attr("y", height + gridSize);
+    .attr( 'y', -75 );
 };
 
 //The g element is a container used to group objects. Transformations applied to the g element are performed on 

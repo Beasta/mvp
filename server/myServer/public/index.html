@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Biometric Data Visualizer</title>
-  <link rel="stylesheet" type="text/css" href="./stylesheets/style.css">
-  <script type="text/javascript" src='./bower_components/d3/d3.min.js'></script>
-  <script type="text/javascript" src = 'heatmap.js'></script>
-</head>
-<body>
-  <select bgcolor = "#333333" id = "weekBox">
-    <!-- <option value="52">52</option> -->
-  </select>
-  <label class = "custom-file-upload">
-    <input type="file" id="uploader">
-    CSV Upload
-  </label>
-  <script type="text/javascript" src = 'fileReader.js'></script>
-  <div id="chart"></div>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Biometric Data Visualizer</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/style.css">
+    <script type="text/javascript" src='./bower_components/d3/d3.min.js'></script>
+    <script type="text/javascript" src = 'heatmap.js'></script>
+  </head>
+  <body>
+    <!-- <select bgcolor = "#333333" id = "weekBox">
+      <option value="52">52</option>
+    </select> -->
+    <!-- <label class = "custom-file-upload"> -->
+    <label id = "uploaderCover">
+      <input type="file" id="uploader">
+      CSV Upload
+    </label>
+    <script type="text/javascript" src = 'fileReader.js'></script>
+    <div id="chart"></div>
+  </body>
 </html>

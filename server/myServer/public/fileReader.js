@@ -1,4 +1,5 @@
 var uploader = document.getElementById("uploader");
+var uploaderCover = document.getElementById("uploaderCover");
 var reader = new FileReader();
 
 reader.onload = function(e) {
@@ -7,7 +8,8 @@ reader.onload = function(e) {
   logTheData(data);
 
   // remove button, since re-initializing doesn't work for now
-  // uploader.parentNode.removeChild(uploader);
+  uploader.parentNode.removeChild(uploader);
+  uploaderCover.parentNode.removeChild(uploaderCover);
 };
 
 uploader.addEventListener("change", handleFiles, false);
